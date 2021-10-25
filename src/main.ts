@@ -2,6 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Logger, ValidationPipe } from '@nestjs/common';
+import { TransformInterceptor } from './interceptor/transform.interceptor';
+import { HttpExceptionFilter } from './filters/http-execption.filter';
+
 import * as cookieParser from 'cookie-parser';
 import * as session from 'express-session';
 
@@ -32,6 +35,8 @@ async function bootstrap() {
   );
 
   app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalInterceptors(new TransformInterceptor());
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   // 如果需要使用全局中间件，则必须使用函数式中间件！
   // app.use(InitMiddleware);

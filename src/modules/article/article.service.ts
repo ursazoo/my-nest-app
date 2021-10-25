@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { IdDTO } from './dto/id.dto';
@@ -38,11 +38,17 @@ export class ArticleService {
   async getOne(idDto: IdDTO) {
     const { id } = idDto;
 
-    return await this.articleRepository
+    const result = await this.articleRepository
       .createQueryBuilder('article')
       .where({ id })
       .select()
       .getOne();
+
+    if (!result) {
+      throw new NotFoundException('找不到该文章');
+    }
+
+    return result;
   }
 
   // 创建文章
