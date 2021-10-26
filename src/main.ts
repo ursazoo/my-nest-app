@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Logger, ValidationPipe } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+
 import { TransformInterceptor } from './interceptor/transform.interceptor';
 import { HttpExceptionFilter } from './filters/http-execption.filter';
 
@@ -40,6 +42,14 @@ async function bootstrap() {
 
   // 如果需要使用全局中间件，则必须使用函数式中间件！
   // app.use(InitMiddleware);
+
+  const options = new DocumentBuilder()
+    .setTitle('blog-serve')
+    .setDescription('接口文档')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, options);
+  SwaggerModule.setup('swagger-doc', app, document);
 
   await app.listen(7788);
 }
