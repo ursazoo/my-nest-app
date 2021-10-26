@@ -1,8 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { getPagination } from 'src/utils';
 import { Repository } from 'typeorm';
+
+import { CreateArticleDTO } from './dto/create-article.dto';
 import { IdDTO } from './dto/id.dto';
 import { ListDTO } from './dto/list.dto';
+import { UpdateArticleDTO } from './dto/update-article.dto';
 import { Article } from './entities/article.entity';
 
 @Injectable()
@@ -19,7 +23,7 @@ export class ArticleService {
   async getAll(listDTO: ListDTO) {
     const { page = 1, pageSize = 10 } = listDTO;
 
-    return await this.articleRepository
+    const result = await this.articleRepository
       // .query(`
       //   SELECT
       //     *
@@ -28,10 +32,25 @@ export class ArticleService {
       // `);
       .createQueryBuilder('article')
       .where({ isDelete: false })
-      .select()
+      .select([
+        'article.id',
+        'article.title',
+        'article.description',
+        'article.createTime',
+        'article.updateTime',
+      ])
       .skip((page - 1) * pageSize)
       .take(pageSize)
-      .getMany();
+      .getManyAndCount();
+
+    const [list, total] = result;
+
+    const pagination = getPagination(total, pageSize, page);
+
+    return {
+      list,
+      pagination,
+    };
   }
 
   // 获取单条
@@ -52,57 +71,80 @@ export class ArticleService {
   }
 
   // 创建文章
-  async create(article: Article) {
-    const result = await this.articleRepository
-      .createQueryBuilder('article')
-      .insert()
-      .into(Article)
-      .values(article)
-      .execute();
+  async create(createArticleDto: CreateArticleDTO) {
+    const article = new Article();
 
-    if (result) {
-      return {
-        data: null,
-        msg: '创建成功',
-        code: 200,
-      };
-    } else {
-      return result;
+    article.title = createArticleDto.title;
+    article.description = createArticleDto.description;
+    article.content = createArticleDto.content;
+
+    const result = await this.articleRepository.save(article);
+    // .createQueryBuilder('article')
+    // .insert()
+    // .into(Article)
+    // .values(article)
+    // .execute();
+
+    if (!result) {
+      throw new NotFoundException('创建文章失败');
     }
+
+    return result;
+
+    // if (result) {
+    //   return {
+    //     data: null,
+    //     msg: '创建成功',
+    //     code: 200,
+    //   };
+    // } else {
+    //   return result;
+    // }
   }
 
   // 更新文章
-  async update(article: Article) {
-    const result = await this.articleRepository
-      .createQueryBuilder('article')
-      .update(Article)
-      .set(article)
-      .where('id = :id', { id: article.id })
-      .execute();
-    if (result) {
-      return {
-        data: null,
-        msg: '修改成功',
-        code: 200,
-      };
-    } else {
-      return result;
+  async update(updateArticleDTO: UpdateArticleDTO) {
+    // const article = await this.articleRepository.findOne(updateArticleDTO.id);
+
+    const article = {
+      ...(await this.articleRepository.findOne(updateArticleDTO.id)),
+      ...updateArticleDTO,
+    };
+
+    delete article.id;
+
+    // .createQueryBuilder('article')
+    // .update(Article)
+    // .set(article)
+    // .where('id = :id', { id: article.id })
+    // .execute();
+
+    const result = await this.articleRepository.save(article);
+
+    if (!result) {
+      throw new NotFoundException('更新文章失败');
     }
+
+    return result;
   }
 
   // 删除文章
   async delete({ id }) {
-    const result = await this.articleRepository
-      .createQueryBuilder()
-      .delete()
-      .from(Article)
-      .where('id = :id', { id })
-      .execute();
+    const article = await this.articleRepository.findOne(id);
 
-    if (result) {
-      return '删除成功';
+    article.isDelete = true;
+
+    const result = await this.articleRepository.save(article);
+    // .createQueryBuilder()
+    // .delete()
+    // .from(Article)
+    // .where('id = :id', { id })
+    // .execute();
+
+    if (!result) {
+      throw new NotFoundException('删除文章失败');
     }
 
-    return result;
+    return null;
   }
 }
