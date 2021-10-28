@@ -1,22 +1,55 @@
 /* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { getConnectionOptions } from 'typeorm';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
+import loadConfig from 'config/configurations';
 
 import { ArticleModule } from './modules/article/article.module';
+import { UserModule } from './modules/user/user.module';
+
+// 依赖模块
+const libModules = [
+  ConfigModule.forRoot({
+    load: [loadConfig],
+    // envFilePath: [DOCKER_ENV ? '.docker.env' : '.env'],
+  }),
+  TypeOrmModule.forRootAsync({
+    imports: [ConfigModule],
+    inject: [ConfigService],
+    useFactory: async (configService: ConfigService) => {
+      const { type, host, port, username, password, database } = configService.get('db')
+      
+      return {
+        // .env 获取
+        type,
+        host,
+        port,
+        username,
+        password,
+        database,
+        // 同步更新数据库
+        synchronize: true,
+        // 自动加载实体
+        autoLoadEntities: true,
+      }
+    }
+  }),
+]
+
+// 业务模块
+const businessModules = [
+  ArticleModule,
+  UserModule,
+]
 
 @Module({
   imports: [
-    TypeOrmModule.forRootAsync({
-      useFactory: async () => ({
-        ...await getConnectionOptions(),
-        autoLoadEntities: true,
-       })
-    }),
-    ArticleModule
+    ...libModules,
+    ...businessModules
   ],
   controllers: [AppController],
   providers: [AppService],
