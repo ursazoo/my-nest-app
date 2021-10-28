@@ -17,6 +17,10 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: new Logger(),
   });
+
+  // 全局路由前缀
+  app.setGlobalPrefix('api');
+
   app.useStaticAssets('public', {
     prefix: '/static/', // 配置虚拟目录之后，就无法通过 localhost:3000/rule.png 来访问图片，必须使用 localhost:3000/static/rule.png
   });
