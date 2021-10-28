@@ -1,5 +1,5 @@
 import { Matches } from 'class-validator';
-import { regPositive } from 'src/utils';
+import { regPositive } from 'src/utils/regex';
 
 export class ListDTO {
   @Matches(regPositive, { message: 'page不可小于0' })

@@ -1,5 +1,5 @@
 import { IsNotEmpty, Matches } from 'class-validator';
-import { regPositive } from 'src/utils';
+import { regPositive } from 'src/utils/regex';
 
 export class IdDTO {
   @IsNotEmpty({ message: 'id不可为空' })
