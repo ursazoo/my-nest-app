@@ -1,4 +1,4 @@
-export interface Article {
+export interface IArticle {
   id?: number; // id
   title: string; // 标题
   description: string; // 描述

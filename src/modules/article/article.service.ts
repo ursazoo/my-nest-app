@@ -19,6 +19,42 @@ export class ArticleService {
     this.list = [];
   }
 
+  // 获取数据库中所有表名
+  async getDatabases() {
+    const result = await this.articleRepository.query(`
+        SELECT SCHEMA_NAME AS 'Database' FROM INFORMATION_SCHEMA.SCHEMATA;
+      `);
+
+    return {
+      result,
+    };
+  }
+
+  // 获取数据库中指定库的所有表名
+  async getTables(dataBaseDTO) {
+    const result = await this.articleRepository.query(
+      `SELECT TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='${dataBaseDTO.database}';`,
+    );
+
+    console.log(result);
+    return {
+      result,
+    };
+  }
+
+  // 获取数据库中指定表的所有列名
+  async getColumns(tableDTO) {
+    console.log(tableDTO);
+    const result = await this.articleRepository.query(
+      `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '${tableDTO.database}' AND TABLE_NAME = '${tableDTO.table}';`,
+    );
+
+    console.log(result);
+    return {
+      result,
+    };
+  }
+
   // 获取列表
   async getAll(listDTO: ListDTO) {
     const { page = 1, pageSize = 10 } = listDTO;

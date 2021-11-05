@@ -10,6 +10,7 @@ import loadConfig from 'config/configurations';
 
 import { ArticleModule } from './modules/article/article.module';
 import { UserModule } from './modules/user/user.module';
+import { QueryModule } from './modules/query/query.module';
 
 // 依赖模块
 const libModules = [
@@ -44,12 +45,13 @@ const libModules = [
 const businessModules = [
   ArticleModule,
   UserModule,
+  QueryModule
 ]
 
 @Module({
   imports: [
     ...libModules,
-    ...businessModules
+    ...businessModules,
   ],
   controllers: [AppController],
   providers: [AppService],
