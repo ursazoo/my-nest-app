@@ -40,6 +40,9 @@ async function bootstrap() {
     session({ secret: 'keyboard', cookie: { maxAge: 10 }, rolling: true }),
   );
 
+  // 允许跨域
+  app.enableCors();
+
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
