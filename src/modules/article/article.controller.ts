@@ -11,21 +11,6 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 export class ArticleController {
   constructor(private articleService: ArticleService) {}
 
-  @Get('databases')
-  getDatabases() {
-    return this.articleService.getDatabases();
-  }
-
-  @Get('tables')
-  getTables(@Query() database: string) {
-    return this.articleService.getTables(database);
-  }
-
-  @Get('columns')
-  getColumns(@Query() columnsDTO: { database: string; table: string }) {
-    return this.articleService.getColumns(columnsDTO);
-  }
-
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @Get('list')

@@ -41,7 +41,7 @@ export class UserService {
    * @param registerDTO
    */
   async checkUserRegister(registerDTO: RegisterDTO): Promise<any> {
-    const { password, passwordRepeat, mobile } = registerDTO;
+    const { password, passwordRepeat, mobile, nickname } = registerDTO;
 
     //   检查密码与确认密码的一致性
     if (password !== passwordRepeat) {
@@ -52,6 +52,12 @@ export class UserService {
     const mobileRegistered = await this.userRepository.findOne({ mobile });
     if (mobileRegistered) {
       throw new NotFoundException('手机号已被注册');
+    }
+
+    // 检查当前昵称是否已被注册
+    const nicknameRegistered = await this.userRepository.findOne({ nickname });
+    if (nicknameRegistered) {
+      throw new NotFoundException('昵称已被注册');
     }
   }
 
@@ -74,13 +80,14 @@ export class UserService {
    * @param loginDTO
    */
   async checkUserLogin(loginDTO: LoginDTO): Promise<any> {
-    const { password, mobile } = loginDTO;
+    const { password, nickname } = loginDTO;
 
     const user = await this.userRepository
       .createQueryBuilder('user')
       .addSelect('user.salt')
       .addSelect('user.password')
-      .where('user.mobile = :mobile', { mobile })
+      // .where('user.mobile = :mobile', { mobile })
+      .where('user.nickname = :nickname', { nickname })
       .getOne();
 
     if (!user) {
