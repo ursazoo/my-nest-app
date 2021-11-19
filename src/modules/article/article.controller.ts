@@ -1,10 +1,19 @@
-import { Controller, Body, Query, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  UseGuards,
+  Body,
+  Query,
+  Get,
+  Post,
+  Put,
+  Delete,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ArticleService } from './article.service';
-import { CreateArticleDTO } from './dto/create-article.dto';
-import { UpdateArticleDTO } from './dto/update-article.dto';
-import { IdDTO } from './dto/id.dto';
-import { ListDTO } from './dto/list.dto';
+import { CreateDto } from './dto/create.dto';
+import { UpdateDto } from './dto/update.dto';
+import { FindByIdDto } from './dto/find-by-id.dto';
+import { FindAllDto } from './dto/find-all.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('article')
@@ -13,34 +22,34 @@ export class ArticleController {
 
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @Get('list')
-  getAll(@Query() listDTO: ListDTO) {
-    return this.articleService.getAll(listDTO);
+  @Get('')
+  findAll(@Query() findAllDto: FindAllDto) {
+    return this.articleService.findAll(findAllDto);
   }
 
-  @Get('info')
-  getOne(@Query() idDto: IdDTO) {
-    return this.articleService.getOne(idDto);
+  @Get(':id')
+  findById(@Query() findByIdDto: FindByIdDto) {
+    return this.articleService.findById(findByIdDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @Post('create')
-  create(@Body() createArticleDTO: CreateArticleDTO) {
-    return this.articleService.create(createArticleDTO as any);
+  create(@Body() createDto: CreateDto) {
+    return this.articleService.create(createDto as any);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @Post('update')
-  update(@Body() updateArticleDTO: UpdateArticleDTO) {
-    return this.articleService.update(updateArticleDTO as any);
+  @Put(':id')
+  update(@Body() updateDto: UpdateDto) {
+    return this.articleService.update(updateDto as any);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @Post('delete')
-  delete(@Body() idDto: IdDTO) {
-    return this.articleService.delete(idDto);
+  @Delete(':id')
+  delete(@Body() findByIdDto: FindByIdDto) {
+    return this.articleService.delete(findByIdDto);
   }
 }

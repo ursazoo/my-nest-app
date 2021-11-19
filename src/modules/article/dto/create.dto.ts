@@ -1,7 +1,7 @@
 import { IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateArticleDTO {
+export class CreateDto {
   @ApiProperty()
   @IsNotEmpty({ message: '文章标题不可为空' })
   readonly title: string;

@@ -3,10 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { getPagination } from 'src/utils';
 import { Repository } from 'typeorm';
 
-import { CreateArticleDTO } from './dto/create-article.dto';
-import { IdDTO } from './dto/id.dto';
-import { ListDTO } from './dto/list.dto';
-import { UpdateArticleDTO } from './dto/update-article.dto';
+import { CreateDto } from './dto/create.dto';
+import { FindByIdDto } from './dto/find-by-id.dto';
+import { FindAllDto } from './dto/find-all.dto';
+import { UpdateDto } from './dto/update.dto';
 import { Article } from './entities/article.entity';
 
 @Injectable()
@@ -20,8 +20,8 @@ export class ArticleService {
   }
 
   // 获取列表
-  async getAll(listDTO: ListDTO) {
-    const { page = 1, pageSize = 10 } = listDTO;
+  async findAll(findAllDto: FindAllDto) {
+    const { pageNo = 1, pageSize = 10 } = findAllDto;
 
     const result = await this.articleRepository
       // .query(`
@@ -39,13 +39,13 @@ export class ArticleService {
         'article.createTime',
         'article.updateTime',
       ])
-      .skip((page - 1) * pageSize)
+      .skip((pageNo - 1) * pageSize)
       .take(pageSize)
       .getManyAndCount();
 
     const [list, total] = result;
 
-    const pagination = getPagination(total, pageSize, page);
+    const pagination = getPagination(total, pageSize, pageNo);
 
     return {
       list,
@@ -54,8 +54,8 @@ export class ArticleService {
   }
 
   // 获取单条
-  async getOne(idDto: IdDTO) {
-    const { id } = idDto;
+  async findById(findByIdDto: FindByIdDto) {
+    const { id } = findByIdDto;
 
     const result = await this.articleRepository
       .createQueryBuilder('article')
@@ -71,12 +71,12 @@ export class ArticleService {
   }
 
   // 创建文章
-  async create(createArticleDto: CreateArticleDTO) {
+  async create(createDto: CreateDto) {
     const article = new Article();
 
-    article.title = createArticleDto.title;
-    article.description = createArticleDto.description;
-    article.content = createArticleDto.content;
+    article.title = createDto.title;
+    article.description = createDto.description;
+    article.content = createDto.content;
 
     const result = await this.articleRepository.save(article);
     // .createQueryBuilder('article')
@@ -103,12 +103,12 @@ export class ArticleService {
   }
 
   // 更新文章
-  async update(updateArticleDTO: UpdateArticleDTO) {
-    // const article = await this.articleRepository.findOne(updateArticleDTO.id);
+  async update(updateDto: UpdateDto) {
+    // const article = await this.articleRepository.findOne(updateDto.id);
 
     const article = {
-      ...(await this.articleRepository.findOne(updateArticleDTO.id)),
-      ...updateArticleDTO,
+      ...(await this.articleRepository.findOne(updateDto.id)),
+      ...updateDto,
     };
 
     delete article.id;
