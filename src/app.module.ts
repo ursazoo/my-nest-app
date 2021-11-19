@@ -11,6 +11,7 @@ import loadConfig from 'config/configurations';
 import { ArticleModule } from './modules/article/article.module';
 import { UserModule } from './modules/user/user.module';
 import { QueryModule } from './modules/query/query.module';
+import { TagModule } from './modules/tag/tag.module';
 
 // 依赖模块
 const libModules = [
@@ -45,7 +46,8 @@ const libModules = [
 const businessModules = [
   ArticleModule,
   UserModule,
-  QueryModule
+  QueryModule,
+  TagModule
 ]
 
 @Module({
