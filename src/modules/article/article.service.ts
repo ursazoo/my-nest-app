@@ -90,16 +90,6 @@ export class ArticleService {
     }
 
     return result;
-
-    // if (result) {
-    //   return {
-    //     data: null,
-    //     msg: '创建成功',
-    //     code: 200,
-    //   };
-    // } else {
-    //   return result;
-    // }
   }
 
   // 更新文章

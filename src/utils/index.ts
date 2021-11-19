@@ -2,18 +2,18 @@
  * 计算分页
  * @param total
  * @param pageSize
- * @param page
+ * @param pageNo
  * @returns
  */
 export const getPagination = (
   total: number,
   pageSize: number,
-  page: number,
+  pageNo: number,
 ) => {
   const pages = Math.ceil(total / pageSize);
   return {
     total,
-    page,
+    pageNo,
     pageSize,
     pages,
   };

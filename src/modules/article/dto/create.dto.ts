@@ -2,11 +2,11 @@ import { IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateDto {
-  @ApiProperty()
+  @ApiProperty({ description: '文章标题' })
   @IsNotEmpty({ message: '文章标题不可为空' })
   readonly title: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: '文章描述' })
   @IsNotEmpty({ message: '文章描述不可为空' })
   readonly description: string;
 

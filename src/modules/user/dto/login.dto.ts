@@ -1,8 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Matches, IsNotEmpty, IsString } from 'class-validator';
-import { regMobile } from 'src/utils/regex';
+import { IsNotEmpty } from 'class-validator';
 
-export class LoginDTO {
+export class LoginDto {
   @ApiProperty({
     description: '登录类型，昵称1，手机号2',
     example: '13399009900',

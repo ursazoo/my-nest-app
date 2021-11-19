@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Matches, IsNotEmpty, IsString } from 'class-validator';
 import { regMobile } from 'src/utils/regex';
 
-export class RegisterDTO {
+export class RegisterDto {
   @ApiProperty({
     description: '手机号，唯一',
     example: '13399009900',

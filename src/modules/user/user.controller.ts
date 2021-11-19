@@ -1,7 +1,7 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { ApiBody, ApiOkResponse } from '@nestjs/swagger';
-import { RegisterDTO } from './dto/register.dto';
-import { LoginDTO } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
 
 import { UserService } from './user.service';
 import { UserInfoResponse } from './vo/user-info.vo';
@@ -11,17 +11,17 @@ import { TokenResponse } from './vo/token.vo';
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @ApiBody({ type: RegisterDTO })
+  @ApiBody({ type: RegisterDto })
   @ApiOkResponse({ description: '注册', type: UserInfoResponse })
   @Post('register')
-  async register(@Body() registerDTO: RegisterDTO): Promise<UserInfoResponse> {
+  async register(@Body() registerDTO: RegisterDto): Promise<UserInfoResponse> {
     return this.userService.register(registerDTO);
   }
 
-  @ApiBody({ type: LoginDTO })
+  @ApiBody({ type: LoginDto })
   @ApiOkResponse({ description: '登录', type: TokenResponse })
   @Post('login')
-  async login(@Body() loginDTO: LoginDTO): Promise<TokenResponse> {
+  async login(@Body() loginDTO: LoginDto): Promise<TokenResponse> {
     return this.userService.login(loginDTO);
   }
 }

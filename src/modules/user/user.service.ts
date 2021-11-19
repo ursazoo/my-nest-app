@@ -5,8 +5,8 @@ import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 
 import { encryptPassword, makeSalt } from 'src/utils/cryptogram';
-import { LoginDTO } from './dto/login.dto';
-import { RegisterDTO } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
 import { TokenVO } from './vo/token.vo';
 
 import { User } from './entities/user.entity';
@@ -19,7 +19,7 @@ export class UserService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(registerDTO: RegisterDTO): Promise<any> {
+  async register(registerDTO: RegisterDto): Promise<any> {
     // 在进入注册逻辑前，先对注册信息进行检查
     await this.checkUserRegister(registerDTO);
 
@@ -40,7 +40,7 @@ export class UserService {
    * 检查用户注册信息
    * @param registerDTO
    */
-  async checkUserRegister(registerDTO: RegisterDTO): Promise<any> {
+  async checkUserRegister(registerDTO: RegisterDto): Promise<any> {
     const { password, passwordRepeat, mobile, nickname } = registerDTO;
 
     //   检查密码与确认密码的一致性
@@ -65,7 +65,7 @@ export class UserService {
    * 用户登录
    * @param loginDTO
    */
-  async login(loginDTO: LoginDTO): Promise<any> {
+  async login(loginDTO: LoginDto): Promise<any> {
     const user = await this.checkUserLogin(loginDTO);
     const token = await this.certificate(user);
     return {
@@ -79,7 +79,7 @@ export class UserService {
    * 检查用户登录信息
    * @param loginDTO
    */
-  async checkUserLogin(loginDTO: LoginDTO): Promise<any> {
+  async checkUserLogin(loginDTO: LoginDto): Promise<any> {
     const { password, nickname } = loginDTO;
 
     const user = await this.userRepository

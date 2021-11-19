@@ -34,7 +34,7 @@ export class ArticleController {
 
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  @Post('create')
+  @Post('')
   create(@Body() createDto: CreateDto) {
     return this.articleService.create(createDto as any);
   }
