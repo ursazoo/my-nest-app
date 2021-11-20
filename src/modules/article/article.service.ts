@@ -23,45 +23,32 @@ export class ArticleService {
   async findAll(findAllDto: FindAllDto) {
     const { pageNo = 1, pageSize = 10 } = findAllDto;
 
-    const result = await this.articleRepository
-      // .query(`
-      //   SELECT
-      //     *
-      //   FROM
-      //     article
-      // `);
-      .createQueryBuilder('article')
-      .where({ isDelete: false })
-      .select([
-        'article.id',
-        'article.title',
-        'article.description',
-        'article.createTime',
-        'article.updateTime',
-      ])
-      .skip((pageNo - 1) * pageSize)
-      .take(pageSize)
-      .getManyAndCount();
+    const result = await this.articleRepository.find({
+      select: ['id', 'title', 'description', 'updateTime'],
+      where: { isDelete: false },
+      skip: (pageNo - 1) * pageSize,
+      take: pageSize,
+    });
 
-    const [list, total] = result;
-
-    const pagination = getPagination(total, pageSize, pageNo);
+    const pagination = getPagination(result?.length, pageSize, pageNo);
 
     return {
-      list,
+      result,
       pagination,
     };
   }
 
   // 获取单条
   async findById(findByIdDto: FindByIdDto) {
-    const { id } = findByIdDto;
+    // const { id } = findByIdDto;
 
-    const result = await this.articleRepository
-      .createQueryBuilder('article')
-      .where({ id })
-      .select()
-      .getOne();
+    // const result = await this.articleRepository
+    //   .createQueryBuilder('article')
+    //   .where({ id })
+    //   .select()
+    //   .getOne();
+
+    const result = await this.articleRepository.findOne(findByIdDto.id);
 
     if (!result) {
       throw new NotFoundException('找不到该文章');
@@ -72,12 +59,7 @@ export class ArticleService {
 
   // 创建文章
   async create(createDto: CreateDto) {
-    const article = new Article();
-
-    article.title = createDto.title;
-    article.description = createDto.description;
-    article.content = createDto.content;
-
+    const article = await this.articleRepository.create(createDto);
     const result = await this.articleRepository.save(article);
     // .createQueryBuilder('article')
     // .insert()
@@ -94,14 +76,20 @@ export class ArticleService {
 
   // 更新文章
   async update(updateDto: UpdateDto) {
-    // const article = await this.articleRepository.findOne(updateDto.id);
+    let article = await this.articleRepository.findOne(updateDto.id);
 
-    const article = {
-      ...(await this.articleRepository.findOne(updateDto.id)),
+    article = {
+      ...article,
       ...updateDto,
+      id: article.id,
     };
 
-    delete article.id;
+    // const article = {
+    //   ...(await this.articleRepository.findOne(updateDto.id)),
+    //   ...updateDto,
+    // };
+
+    // delete article.id;
 
     // .createQueryBuilder('article')
     // .update(Article)
@@ -125,11 +113,6 @@ export class ArticleService {
     article.isDelete = true;
 
     const result = await this.articleRepository.save(article);
-    // .createQueryBuilder()
-    // .delete()
-    // .from(Article)
-    // .where('id = :id', { id })
-    // .execute();
 
     if (!result) {
       throw new NotFoundException('删除文章失败');
