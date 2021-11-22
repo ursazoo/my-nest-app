@@ -17,7 +17,11 @@ export class Tag extends Common {
   color: string;
 
   // 标签状态
-  @Column('int')
+  @Column({
+    type: 'enum',
+    enum: ETagStatus,
+    default: ETagStatus['启用中'],
+  })
   @IsNotEmpty()
   status: ETagStatus;
 }
