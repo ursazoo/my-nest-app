@@ -3,13 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DataBaseDTO } from './dto/database.dto';
 import { TableDTO } from './dto/table.dto';
-import { Query } from './entities/query.entity';
+import { QueryEntity } from './entities/query.entity';
 
 @Injectable()
 export class QueryService {
   constructor(
-    @InjectRepository(Query)
-    private readonly queryRepository: Repository<Query>,
+    @InjectRepository(QueryEntity)
+    private readonly queryRepository: Repository<QueryEntity>,
   ) {}
   // 获取数据库中所有表名
   async getDatabases() {
