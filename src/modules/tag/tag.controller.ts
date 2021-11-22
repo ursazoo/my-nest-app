@@ -11,7 +11,6 @@ import { CreateDto } from './dto/create.dto';
 import { FindAllDto } from './dto/find-all.dto';
 import { FindByIdDto } from './dto/find-by-id.dto';
 import { UpdateDto } from './dto/update.dto';
-// import { ListDTO } from './dto/f.dto';
 import { TagService } from './tag.service';
 
 @Controller('tag')

@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, Matches } from 'class-validator';
 import { regPositive } from 'src/utils/regex';
+import { ETagStatus } from '../interface';
 
 export class UpdateDto {
   @ApiProperty({ description: '标签id' })
@@ -15,4 +16,8 @@ export class UpdateDto {
   @ApiProperty({ description: '标签颜色' })
   @IsNotEmpty({ message: '请输入标签颜色' })
   readonly color: string;
+
+  @ApiProperty({ description: '标签状态' })
+  @IsNotEmpty({ message: '请输入标签状态' })
+  readonly status: ETagStatus;
 }

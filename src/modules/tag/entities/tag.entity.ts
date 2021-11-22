@@ -2,6 +2,7 @@ import { Column, Entity } from 'typeorm';
 import { IsNotEmpty } from 'class-validator';
 
 import { Common } from 'src/common/entity/common.entity';
+import { ETagStatus } from '../interface';
 
 @Entity()
 export class Tag extends Common {
@@ -14,4 +15,9 @@ export class Tag extends Common {
   @Column('text')
   @IsNotEmpty()
   color: string;
+
+  // 标签状态
+  @Column('int')
+  @IsNotEmpty()
+  status: ETagStatus;
 }

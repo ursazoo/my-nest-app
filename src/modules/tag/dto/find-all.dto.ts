@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Matches } from 'class-validator';
 import { regPositive } from 'src/utils/regex';
+import { ETagStatus } from '../interface';
 
 export class FindAllDto {
   @Matches(regPositive, { message: 'pageNo必须大于0' })
@@ -14,6 +15,9 @@ export class FindAllDto {
 
   @ApiProperty({ description: '标签id' })
   readonly id?: string;
+
+  @ApiProperty({ description: '标签状态' })
+  readonly status?: ETagStatus;
 
   @ApiProperty({ description: '标签是否被删除' })
   readonly isDelete?: boolean;

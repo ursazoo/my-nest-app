@@ -19,7 +19,7 @@ export class TagService {
   }
   // 获取列表
   async findAll(findAllDto: FindAllDto) {
-    const { pageNo = 1, pageSize = 10 } = findAllDto;
+    const { pageNo = 1, pageSize = 10, status } = findAllDto;
 
     // const result = await this.tagRepository
     //   .createQueryBuilder('tag')
@@ -29,21 +29,21 @@ export class TagService {
     //   .take(pageSize)
     //   .getManyAndCount();
 
-    const result = await this.tagRepository.find({
-      select: ['id', 'label', 'color'],
-      where: { isDelete: false },
+    const list = await this.tagRepository.find({
+      select: ['id', 'label', 'color', 'status'],
+      where: { isDelete: false, status },
       skip: (pageNo - 1) * pageSize,
       take: pageSize,
     });
 
-    if (!result) {
+    if (!list) {
       throw new NotFoundException('查询标签失败');
     }
 
-    const pagination = getPagination(result?.length, pageSize, pageNo);
+    const pagination = getPagination(list?.length, pageSize, pageNo);
 
     return {
-      result,
+      list,
       pagination,
     };
   }
