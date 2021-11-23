@@ -7,14 +7,14 @@ import { CreateDto } from './dto/create.dto';
 import { FindByIdDto } from './dto/find-by-id.dto';
 import { FindAllDto } from './dto/find-all.dto';
 import { UpdateDto } from './dto/update.dto';
-import { ArticleEntity } from './entities/article.entity';
+import { Article } from './entities/article.entity';
 
 @Injectable()
 export class ArticleService {
   list: any[];
   constructor(
-    @InjectRepository(ArticleEntity)
-    private readonly articleRepository: Repository<ArticleEntity>,
+    @InjectRepository(Article)
+    private readonly articleRepository: Repository<Article>,
   ) {
     this.list = [];
   }

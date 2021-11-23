@@ -6,14 +6,14 @@ import { CreateDto } from './dto/create.dto';
 import { FindAllDto } from './dto/find-all.dto';
 import { FindByIdDto } from './dto/find-by-id.dto';
 import { UpdateDto } from './dto/update.dto';
-import { TagEntity } from './entities/tag.entity';
+import { Tag } from './entities/tag.entity';
 
 @Injectable()
 export class TagService {
   list: any[];
   constructor(
-    @InjectRepository(TagEntity)
-    private readonly tagRepository: Repository<TagEntity>,
+    @InjectRepository(Tag)
+    private readonly tagRepository: Repository<Tag>,
   ) {
     this.list = [];
   }

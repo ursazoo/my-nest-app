@@ -9,13 +9,13 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { TokenVO } from './vo/token.vo';
 
-import { UserEntity } from './entities/user.entity';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -27,7 +27,7 @@ export class UserService {
     const salt = makeSalt();
     const hashPassword = encryptPassword(password, salt);
 
-    const newUser: UserEntity = new UserEntity();
+    const newUser: User = new User();
     newUser.mobile = mobile;
     newUser.nickname = nickname;
     newUser.password = hashPassword;
@@ -107,7 +107,7 @@ export class UserService {
   /**
    * 生成token
    */
-  async certificate(user: UserEntity) {
+  async certificate(user: User) {
     console.log(`user: `, user);
     const payload = {
       id: user.id,

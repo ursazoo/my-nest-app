@@ -3,7 +3,7 @@ import { Entity, Column } from 'typeorm';
 import { Common } from 'src/common/entity/common.entity';
 
 @Entity()
-export class UserEntity extends Common {
+export class User extends Common {
   // 昵称
   @Column('text')
   nickname: string;

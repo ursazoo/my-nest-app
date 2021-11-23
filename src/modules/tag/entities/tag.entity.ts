@@ -5,7 +5,7 @@ import { Common } from 'src/common/entity/common.entity';
 import { ETagStatus } from '../interface';
 
 @Entity()
-export class TagEntity extends Common {
+export class Tag extends Common {
   // 标签名称
   @Column('text')
   @IsNotEmpty()
