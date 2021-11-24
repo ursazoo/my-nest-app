@@ -6,6 +6,7 @@ export interface ITag {
 }
 
 export enum ETagStatus {
-  '禁用中',
+  '全部',
   '启用中',
+  '禁用中',
 }

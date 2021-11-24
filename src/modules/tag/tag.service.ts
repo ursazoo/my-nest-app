@@ -1,12 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getPagination } from 'src/utils';
 import { getConnection, Repository } from 'typeorm';
+
+import { getPagination } from 'src/utils';
 import { CreateDto } from './dto/create.dto';
 import { FindAllDto } from './dto/find-all.dto';
 import { FindByIdDto } from './dto/find-by-id.dto';
 import { UpdateDto } from './dto/update.dto';
 import { Tag } from './entities/tag.entity';
+import { ETagStatus } from './interface';
 
 @Injectable()
 export class TagService {
@@ -19,7 +21,7 @@ export class TagService {
   }
   // 获取列表
   async findAll(findAllDto: FindAllDto) {
-    const { pageNo = 1, pageSize = 10, status } = findAllDto;
+    const { pageNo = 1, pageSize = 10, label, status } = findAllDto;
 
     // const result = await this.tagRepository
     //   .createQueryBuilder('tag')
@@ -29,18 +31,33 @@ export class TagService {
     //   .take(pageSize)
     //   .getManyAndCount();
 
-    const list = await this.tagRepository.find({
+    const condition = {
+      isDelete: false,
+      label,
+      status,
+    };
+
+    if (+status === ETagStatus['全部']) {
+      delete condition.status;
+    }
+
+    if (!label || label.trim() === '') {
+      delete condition.label;
+    }
+
+    const result = await this.tagRepository.findAndCount({
       select: ['id', 'label', 'color', 'status'],
-      where: { isDelete: false, status },
+      where: condition,
       skip: (pageNo - 1) * pageSize,
       take: pageSize,
     });
 
-    if (!list) {
+    if (!result) {
       throw new NotFoundException('查询标签失败');
     }
+    const [list, total] = result;
 
-    const pagination = getPagination(list?.length, pageSize, pageNo);
+    const pagination = getPagination(total, pageSize, pageNo);
 
     return {
       list,
@@ -62,6 +79,7 @@ export class TagService {
 
   // 更新标签
   async update(updateDto: UpdateDto) {
+    console.log(updateDto);
     // const result = await getConnection()
     //   .createQueryBuilder()
     //   .update(Tag)
@@ -72,22 +90,29 @@ export class TagService {
     // return result;
     const tag = await this.tagRepository.findOne(updateDto.id);
 
-    tag.color = updateDto.color;
-    tag.label = updateDto.label;
+    // tag.color = updateDto.color;
+    // tag.label = updateDto.label;
 
-    // tag = {
-    //   ...tag,
-    //   ...updateDto,
-    //   id: tag.id,
-    // };
+    const modifyTag = {
+      ...tag,
+      ...updateDto,
+      id: tag.id,
+    };
 
-    const result = await this.tagRepository.save(tag);
+    const result = await this.tagRepository.save(modifyTag);
 
     if (!result) {
       throw new NotFoundException('更新标签失败');
     }
 
-    return result;
+    const { id, label, color, status } = result;
+
+    return {
+      id,
+      label,
+      color,
+      status,
+    };
   }
 
   // 删除标签

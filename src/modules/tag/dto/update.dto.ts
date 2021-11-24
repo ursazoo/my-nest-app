@@ -6,7 +6,7 @@ import { ETagStatus } from '../interface';
 export class UpdateDto {
   @ApiProperty({ description: '标签id' })
   @IsNotEmpty({ message: '请输入id' })
-  @Matches(regPositive, { message: '请输入有效的id' })
+  // @Matches(regPositive, { message: '请输入有效的id' })
   readonly id: number;
 
   @ApiProperty({ description: '标签名称' })
