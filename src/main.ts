@@ -1,11 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 import { TransformInterceptor } from './interceptor/transform.interceptor';
 import { HttpExceptionFilter } from './filters/http-execption.filter';
+import { AllExceptionsFilter } from './filters/any-exception.filter';
 
 import * as cookieParser from 'cookie-parser';
 import * as session from 'express-session';
@@ -15,8 +16,32 @@ import * as session from 'express-session';
 async function bootstrap() {
   // 在 create 方法中指定泛型 NestExpressApplication ，表示使用的是 express 平台
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: new Logger(),
+    // cors: {
+    //   // origin: ['http://localhost', 'http://localhost:3000'],
+    //   origin: ['*'],
+    //   credentials: true,
+    // },
+    bufferLogs: true,
+    // logger: new Logger(),
   });
+
+  // 允许跨域
+  app.enableCors();
+
+  const setupSwagger = (app) => {
+    const config = new DocumentBuilder()
+      .setTitle('blog-serve')
+      .setDescription('接口文档')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('swagger-doc', app, document, {
+      swaggerOptions: {
+        persistAuthorization: true,
+      },
+    });
+  };
 
   // 全局路由前缀
   app.setGlobalPrefix('api');
@@ -26,10 +51,10 @@ async function bootstrap() {
   });
 
   // 配置模板引擎文件的位置
-  app.setBaseViewsDir('views');
+  // app.setBaseViewsDir('views');
 
   // 配置使用的模板引擎
-  app.setViewEngine('ejs');
+  // app.setViewEngine('ejs');
 
   // 配置 cookie 中间件
   app.use(cookieParser());
@@ -40,24 +65,15 @@ async function bootstrap() {
     session({ secret: 'keyboard', cookie: { maxAge: 10 }, rolling: true }),
   );
 
-  // 允许跨域
-  app.enableCors();
-
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new TransformInterceptor());
+  app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalFilters(new HttpExceptionFilter());
 
-  // 如果需要使用全局中间件，则必须使用函数式中间件！
-  // app.use(InitMiddleware);
+  // 使用日志中间件（如果需要使用全局中间件，则必须使用函数式中间件）
+  // app.use(new LoggerMiddleware());
 
-  const options = new DocumentBuilder()
-    .setTitle('blog-serve')
-    .setDescription('接口文档')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-  const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('swagger-doc', app, document);
+  setupSwagger(app);
 
   await app.listen(7788);
 }

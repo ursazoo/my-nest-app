@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
@@ -12,6 +12,8 @@ import { ArticleModule } from './modules/article/article.module';
 import { UserModule } from './modules/user/user.module';
 import { QueryModule } from './modules/query/query.module';
 import { TagModule } from './modules/tag/tag.module';
+import { ImageHostModule } from './modules/image-host/image-host.module';
+import { LoggerMiddleware } from './middlewares/logger/logger.middleware';
 
 // 依赖模块
 const libModules = [
@@ -47,7 +49,8 @@ const businessModules = [
   ArticleModule,
   UserModule,
   QueryModule,
-  TagModule
+  TagModule,
+  ImageHostModule
 ]
 
 @Module({
@@ -60,6 +63,11 @@ const businessModules = [
 })
 
 export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware)
+      .forRoutes('*');
+  }
   // configure(consumer: MiddlewareConsumer) {
   //   // consumer.apply(InitMiddleware)
   //   //   .forRoutes('*') // 标识匹配所有路由
