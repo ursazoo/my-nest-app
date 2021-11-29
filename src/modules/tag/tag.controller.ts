@@ -3,13 +3,14 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Post,
   Put,
   Query,
 } from '@nestjs/common';
 import { CreateDto } from './dto/create.dto';
 import { FindAllDto } from './dto/find-all.dto';
-import { FindByIdDto } from './dto/find-by-id.dto';
+import { FindByIdsDto } from './dto/find-by-ids.dto';
 import { UpdateDto } from './dto/update.dto';
 import { TagService } from './tag.service';
 
@@ -20,6 +21,12 @@ export class TagController {
   @Get('')
   findAll(@Query() findAllDto: FindAllDto) {
     return this.tagService.findAll(findAllDto);
+  }
+
+  @Post('ids')
+  // 从路由中获取动态数据时，可以使用 :param 的形式，直接获取
+  findByIds(@Body() findByIdsDto: FindByIdsDto) {
+    return this.tagService.findByIds(findByIdsDto);
   }
 
   @Post('')
@@ -33,7 +40,7 @@ export class TagController {
   }
 
   @Delete('')
-  delete(@Body() findByIdDto: FindByIdDto) {
-    return this.tagService.delete(findByIdDto);
+  delete(@Body() findByIdsDto: FindByIdsDto) {
+    return this.tagService.delete(findByIdsDto);
   }
 }

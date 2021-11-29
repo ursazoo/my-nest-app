@@ -1,7 +1,9 @@
-import { Matches } from 'class-validator';
-import { regPositive } from 'src/utils/regex';
+import { IsNotEmpty } from 'class-validator';
 
-export class FindAllDto {
+export class FindAllByTagDto {
+  @IsNotEmpty({ message: '标签id不可为空' })
+  readonly tagId: string;
+
   // @Matches(regPositive, { message: 'page不可小于0' })
   readonly pageNo?: number;
 

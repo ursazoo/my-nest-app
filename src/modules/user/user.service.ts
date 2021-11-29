@@ -9,7 +9,7 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { TokenVO } from './vo/token.vo';
 
-import { User } from './entities/user.entity';
+import { User } from './entity/user.entity';
 
 @Injectable()
 export class UserService {

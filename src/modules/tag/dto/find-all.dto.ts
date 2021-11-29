@@ -4,10 +4,10 @@ import { regPositive } from 'src/utils/regex';
 import { ETagStatus } from '../interface';
 
 export class FindAllDto {
-  @Matches(regPositive, { message: 'pageNo必须大于0' })
+  // @Matches(regPositive, { message: 'pageNo必须大于0' })
   readonly pageNo?: number;
 
-  @Matches(regPositive, { message: 'pageSize必须大于0' })
+  // @Matches(regPositive, { message: 'pageSize必须大于0' })
   readonly pageSize?: number;
 
   @ApiProperty({ description: '标签名称' })

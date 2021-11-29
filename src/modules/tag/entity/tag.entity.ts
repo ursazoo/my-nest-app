@@ -1,7 +1,9 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 import { IsNotEmpty } from 'class-validator';
 
 import { Common } from 'src/common/entity/common.entity';
+import { Article } from 'src/modules/article/entity/article.entity';
+
 import { ETagStatus } from '../interface';
 
 @Entity()
@@ -24,4 +26,8 @@ export class Tag extends Common {
   })
   @IsNotEmpty()
   status: ETagStatus;
+
+  // 标签关联的文章
+  @ManyToMany((type) => Article, (article) => article.tags)
+  articles: Article[];
 }

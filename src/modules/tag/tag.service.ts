@@ -1,13 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getConnection, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import { getPagination } from 'src/utils';
 import { CreateDto } from './dto/create.dto';
 import { FindAllDto } from './dto/find-all.dto';
-import { FindByIdDto } from './dto/find-by-id.dto';
+import { FindByIdsDto } from './dto/find-by-ids.dto';
 import { UpdateDto } from './dto/update.dto';
-import { Tag } from './entities/tag.entity';
+import { Tag } from './entity/tag.entity';
 import { ETagStatus } from './interface';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class TagService {
   list: any[];
   constructor(
     @InjectRepository(Tag)
-    private readonly tagRepository: Repository<Tag>,
+    private readonly tagRepo: Repository<Tag>,
   ) {
     this.list = [];
   }
@@ -23,7 +23,7 @@ export class TagService {
   async findAll(findAllDto: FindAllDto) {
     const { pageNo = 1, pageSize = 10, label, status } = findAllDto;
 
-    // const result = await this.tagRepository
+    // const result = await this.tagRepo
     //   .createQueryBuilder('tag')
     //   .where({ isDelete: false })
     //   .select(['tag.id', 'tag.label', 'tag.color'])
@@ -37,7 +37,7 @@ export class TagService {
       status,
     };
 
-    if (+status === ETagStatus['全部']) {
+    if (+status === ETagStatus['全部'] || !status) {
       delete condition.status;
     }
 
@@ -45,13 +45,24 @@ export class TagService {
       delete condition.label;
     }
 
-    const result = await this.tagRepository.findAndCount({
-      select: ['id', 'label', 'color', 'status'],
-      where: condition,
-      skip: (pageNo - 1) * pageSize,
-      take: pageSize,
-    });
+    // const result = await this.tagRepo.findAndCount({
+    //   select: ['id', 'label', 'color', 'status'],
+    //   where: condition,
+    //   skip: (pageNo - 1) * pageSize,
+    //   take: pageSize,
+    // });
 
+    const result = await this.tagRepo
+      .createQueryBuilder('tag')
+      .where('tag.isDelete = :isDelete', { isDelete: false })
+      .leftJoin('tag.articles', 'article')
+      .select(['tag.id', 'tag.label', 'tag.color'])
+      .addSelect(['article.id', 'article.title'])
+      .skip((pageNo - 1) * pageSize)
+      .take(pageSize)
+      .getManyAndCount();
+
+    console.log(`result: `, result);
     if (!result) {
       throw new NotFoundException('查询标签失败');
     }
@@ -65,10 +76,31 @@ export class TagService {
     };
   }
 
+  // 根据id获取多个标签
+  async findByIds(findByIdsDto: FindByIdsDto) {
+    const { ids } = findByIdsDto;
+    const result = await this.tagRepo
+      .createQueryBuilder('tag')
+      .where('tag.id IN (:...ids)', { ids })
+      .select(['tag.id', 'tag.label', 'tag.color'])
+      // .skip(10)
+      // .take(10)
+      .getManyAndCount();
+    // const tag = await this.tagRepo.findOne(findByIdDto.ids);
+    const [list, total] = result;
+    const pagination = getPagination(total, 10, 1);
+
+    console.log(result);
+    return {
+      list,
+      pagination,
+    };
+  }
+
   // 创建标签
   async create(createDto: CreateDto) {
-    const tag = await this.tagRepository.create(createDto);
-    const result = await this.tagRepository.save(tag);
+    const tag = await this.tagRepo.create(createDto);
+    const result = await this.tagRepo.save(tag);
 
     if (!result) {
       throw new NotFoundException('创建标签失败');
@@ -88,7 +120,7 @@ export class TagService {
     //   .execute();
 
     // return result;
-    const tag = await this.tagRepository.findOne(updateDto.id);
+    const tag = await this.tagRepo.findOne(updateDto.id);
 
     // tag.color = updateDto.color;
     // tag.label = updateDto.label;
@@ -99,7 +131,7 @@ export class TagService {
       id: tag.id,
     };
 
-    const result = await this.tagRepository.save(modifyTag);
+    const result = await this.tagRepo.save(modifyTag);
 
     if (!result) {
       throw new NotFoundException('更新标签失败');
@@ -116,17 +148,17 @@ export class TagService {
   }
 
   // 删除标签
-  async delete(findByIdDto: FindByIdDto) {
+  async delete(findByIdDto: FindByIdsDto) {
     /**
      * 物理删除
      * 
-     * const tag = await this.tagRepository.findOne(findByIdDto.id);
+     * const tag = await this.tagRepo.findOne(findByIdDto.id);
 
         if (!tag) {
         throw new Error('未找到指定标签');
         }
 
-        const result = await this.tagRepository.remove(tag);
+        const result = await this.tagRepo.remove(tag);
 
         if (!result) {
         throw new Error('删除标签失败');
@@ -136,11 +168,11 @@ export class TagService {
      */
 
     //  逻辑删除
-    const tag = await this.tagRepository.findOne(findByIdDto.id);
+    const tag = await this.tagRepo.findOne(findByIdDto.ids[0]);
 
     tag.isDelete = true;
 
-    const result = await this.tagRepository.save(tag);
+    const result = await this.tagRepo.save(tag);
 
     if (!result) {
       throw new NotFoundException('删除标签失败');

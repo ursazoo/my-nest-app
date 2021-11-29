@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DataBaseDTO } from './dto/database.dto';
 import { TableDTO } from './dto/table.dto';
-import { Query } from './entities/query.entity';
+import { Query } from './entity/query.entity';
 
 @Injectable()
 export class QueryService {

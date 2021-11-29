@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Query } from './entities/query.entity';
+import { Query } from './entity/query.entity';
 import { QueryController } from './query.controller';
 import { QueryService } from './query.service';
 

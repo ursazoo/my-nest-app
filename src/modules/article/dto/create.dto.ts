@@ -1,20 +1,27 @@
 import { IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Tag } from 'src/modules/tag/entity/tag.entity';
 
 export class CreateDto {
   @ApiProperty({ description: '文章标题' })
   @IsNotEmpty({ message: '文章标题不可为空' })
-  readonly title: string;
+  title: string;
 
   @ApiProperty({ description: '文章描述' })
   @IsNotEmpty({ message: '文章描述不可为空' })
-  readonly description: string;
+  description: string;
 
   @ApiProperty({
     required: false,
-    description:
-      '[用户角色]: 0-超级管理员 | 1-管理员 | 2-开发&测试&运营 | 3-普通用户（只能查看）',
+    description: '文章内容',
   })
   @IsNotEmpty({ message: '文章内容不可为空' })
-  readonly content: string;
+  content: string;
+
+  /**
+   * 标签 格式 [{id: 1}, {id: 2}]
+   * @example  [{id: 1}]
+   */
+  @ApiProperty({ type: () => Tag })
+  tags?: Tag[];
 }
