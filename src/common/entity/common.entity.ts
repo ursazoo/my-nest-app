@@ -21,10 +21,10 @@ export abstract class Common {
 
   // 软删除
   @Column({
-    default: false,
+    default: 0,
     select: false,
   })
-  isDelete: boolean;
+  isDelete: number;
 
   // 更新次数
   @VersionColumn({

@@ -1,10 +1,26 @@
-import { Matches } from 'class-validator';
-import { regPositive } from 'src/utils/regex';
+// import { Matches } from 'class-validator';
+// import { regPositive } from 'src/utils/regex';
+import {
+  EArticleIsPublic,
+  EArticleStatus,
+} from '../interface/article.interface';
 
 export class FindAllDto {
   // @Matches(regPositive, { message: 'page不可小于0' })
-  readonly pageNo?: number;
+  pageNo?: number;
 
   // @Matches(regPositive, { message: 'pageSize不可小于0' })
-  readonly pageSize?: number;
+  pageSize?: number;
+
+  readonly tagIds?: string;
+
+  readonly status?: EArticleStatus;
+
+  readonly isPublic?: EArticleIsPublic;
+
+  readonly isDelete?: number;
+
+  readonly createTime?: string;
+
+  readonly updateTime?: string;
 }

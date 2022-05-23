@@ -20,5 +20,5 @@ export class FindAllDto {
   readonly status?: ETagStatus;
 
   @ApiProperty({ description: '标签是否被删除' })
-  readonly isDelete?: boolean;
+  readonly isDelete?: number;
 }

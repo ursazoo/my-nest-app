@@ -19,20 +19,13 @@ export class TagService {
   ) {
     this.list = [];
   }
+
   // 获取列表
   async findAll(findAllDto: FindAllDto) {
     const { pageNo = 1, pageSize = 10, label, status } = findAllDto;
 
-    // const result = await this.tagRepo
-    //   .createQueryBuilder('tag')
-    //   .where({ isDelete: false })
-    //   .select(['tag.id', 'tag.label', 'tag.color'])
-    //   .skip((pageNo - 1) * pageSize)
-    //   .take(pageSize)
-    //   .getManyAndCount();
-
     const condition = {
-      isDelete: false,
+      isDelete: 0,
       label,
       status,
     };
@@ -45,16 +38,48 @@ export class TagService {
       delete condition.label;
     }
 
-    // const result = await this.tagRepo.findAndCount({
-    //   select: ['id', 'label', 'color', 'status'],
-    //   where: condition,
-    //   skip: (pageNo - 1) * pageSize,
-    //   take: pageSize,
-    // });
+    const result = await this.tagRepo
+      .createQueryBuilder('tag')
+      .where('tag.isDelete = :isDelete', { isDelete: 0 })
+      .select(['tag.id', 'tag.label', 'tag.color'])
+      .skip((pageNo - 1) * pageSize)
+      .take(pageSize)
+      .getManyAndCount();
+
+    if (!result) {
+      throw new NotFoundException('查询标签失败');
+    }
+    const [list, total] = result;
+
+    const pagination = getPagination(total, pageSize, pageNo);
+
+    return {
+      list,
+      pagination,
+    };
+  }
+
+  // 获取列表（携带关联的文章信息）
+  async findAllWithArticle(findAllDto: FindAllDto) {
+    const { pageNo = 1, pageSize = 10, label, status } = findAllDto;
+
+    const condition = {
+      isDelete: 0,
+      label,
+      status,
+    };
+
+    if (+status === ETagStatus['全部'] || !status) {
+      delete condition.status;
+    }
+
+    if (!label || label.trim() === '') {
+      delete condition.label;
+    }
 
     const result = await this.tagRepo
       .createQueryBuilder('tag')
-      .where('tag.isDelete = :isDelete', { isDelete: false })
+      .where('tag.isDelete = :isDelete', { isDelete: 0 })
       .leftJoin('tag.articles', 'article')
       .select(['tag.id', 'tag.label', 'tag.color'])
       .addSelect(['article.id', 'article.title'])
@@ -62,7 +87,6 @@ export class TagService {
       .take(pageSize)
       .getManyAndCount();
 
-    console.log(`result: `, result);
     if (!result) {
       throw new NotFoundException('查询标签失败');
     }
@@ -170,7 +194,7 @@ export class TagService {
     //  逻辑删除
     const tag = await this.tagRepo.findOne(findByIdDto.ids[0]);
 
-    tag.isDelete = true;
+    tag.isDelete = 1;
 
     const result = await this.tagRepo.save(tag);
 

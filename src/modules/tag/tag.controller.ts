@@ -23,6 +23,11 @@ export class TagController {
     return this.tagService.findAll(findAllDto);
   }
 
+  @Get('withArticle')
+  findAllWithArticle(@Query() findAllDto: FindAllDto) {
+    return this.tagService.findAllWithArticle(findAllDto);
+  }
+
   @Post('ids')
   // 从路由中获取动态数据时，可以使用 :param 的形式，直接获取
   findByIds(@Body() findByIdsDto: FindByIdsDto) {
